@@ -6,11 +6,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.GeckoDriverInfo;
+
 import ru.yandex.praktikum.objects.MainPage;
 import ru.yandex.praktikum.objects.OrderPage;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -45,7 +47,8 @@ public class ScooterTest {
     @Before
     public void startUp() {
         //WebDriverManager.chromedriver().setup();
-        driver = WebDriverManager.firefoxdriver().create();
+        //WebDriverManager.firefoxdriver().setup();
+        WebDriverManager.edgedriver().setup();
 
     }
 
@@ -63,8 +66,8 @@ public class ScooterTest {
 
     @Test
     public void testMainPage() {
-        //driver = new ChromeDriver();
-        //driver = new FirefoxDriver();
+
+        driver = new EdgeDriver();
 
         //открываем страницу
         driver.get("https://qa-scooter.praktikum-services.ru/");
@@ -86,7 +89,7 @@ public class ScooterTest {
     public void testOrderPage() {
         //driver = new ChromeDriver();
         //driver = new FirefoxDriver();
-
+        driver = new EdgeDriver();
 
         //открываем страницу
         driver.get("https://qa-scooter.praktikum-services.ru/");
@@ -116,12 +119,23 @@ public class ScooterTest {
         //подтверждаем заказ, нажав на кнопку "Да"
         orderPageObj.clickYesOrderButton();
 
+        //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
+        assertTrue(driver.findElement(orderPageObj.getConfirmWindow()).isDisplayed());
+
+        //смотрим статус заказа
+        orderPageObj.clickSeeStatusButton();
+
+        //проверяем что после нажатия на лого самоката нас перекинет на главную страницу проката самокатов
+        assertEquals("https://qa-scooter.praktikum-services.ru/", orderPageObj.checkUrlScooterLogoClick());
+
+        //проверяем что при нажатии на лого Яндекс нас перекинет на новую страницу с нужным адресом
+        assertEquals("https://dzen.ru/?yredirect=true", orderPageObj.checkUrlYandexLogoClick());
+
     }
 
-
-//    @After
-//    public void tearDown() {
-//        driver.quit();
-//    }
+    @After
+    public void tearDown() {
+        driver.quit();
+    }
 
 }

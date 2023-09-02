@@ -25,22 +25,20 @@ public class MainPage {
     private final By bottomOrderButton = By.xpath("//*[@id=\"root\"]/div/div/div[4]/div[2]/div[5]/button");
 
     //общий вид локатора для кнопок-стрелок
-    private String arrowButton = "//*[@id='accordion__heading-']";
+    private final String arrowButton = "//*[@id='accordion__heading-']";
 
     // строка для использования в цикле для нажатия на кнопки по шаблону локатора
-    private String mod = arrowButton.substring(0, arrowButton.length() - 2);
+    private final String mod = arrowButton.substring(0, arrowButton.length() - 2);
 
     //общий вид локатора для текста под кнопками-стрелками
-    private String textLocator = "//*[@id='accordion__panel-']";
+    private final String textLocator = "//*[@id='accordion__panel-']";
 
     //строка для использования в цикле для нахождения текста определенной кнопки
-    private String modText = textLocator.substring(0, textLocator.length() - 2);
+    private final String modText = textLocator.substring(0, textLocator.length() - 2);
 
     public MainPage(WebDriver driver) {
         this.driver = driver;
     }
-
-
 
     public void checkArrowsText() {
         for (int i = 0; i < 8; i++) {
