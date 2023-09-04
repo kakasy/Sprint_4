@@ -40,58 +40,53 @@ public class MainPage {
         this.driver = driver;
     }
 
-    public void checkArrowsText() {
-        for (int i = 0; i < 8; i++) {
+    public void checkArrowsText(int number) {
             // подставляем в строку для выражения локатора номер кнопки-стрелки и закрываем выражение
-            WebElement element = driver.findElement(By.xpath(mod + i + "']"));
+            WebElement element = driver.findElement(By.xpath(mod + number + "']"));
             //скроллим до нужного элемента
             ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
             element.click();
             //ждем пока появится текст
             new WebDriverWait(driver, Duration.ofSeconds(1))
                     .until(ExpectedConditions
-                            .visibilityOf(driver.findElement(By.xpath(modText + i + "']"))));
+                            .visibilityOf(driver.findElement(By.xpath(modText + number + "']"))));
             ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
 
 
-            if (i == 0) {
+            if (number == 0) {
                 assertEquals("Сутки — 400 рублей. Оплата курьеру — наличными или картой.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else if (i == 1) {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 1) {
                 assertEquals("Пока что у нас так: один заказ — один самокат. " +
                                 "Если хотите покататься с друзьями, " +
                                 "можете просто сделать несколько заказов — один за другим.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else if (i == 2) {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 2) {
                 assertEquals("Допустим, вы оформляете заказ на 8 мая. " +
                                 "Мы привозим самокат 8 мая в течение дня. " +
                                 "Отсчёт времени аренды начинается с момента, когда вы оплатите заказ курьеру. " +
                                 "Если мы привезли самокат 8 мая в 20:30, суточная аренда закончится 9 мая в 20:30.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else if (i == 3) {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 3) {
                 assertEquals("Только начиная с завтрашнего дня. Но скоро станем расторопнее.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else if (i == 4) {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 4) {
                 assertEquals("Пока что нет! " +
                                 "Но если что-то срочное — всегда можно позвонить в поддержку по красивому номеру 1010.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else if (i == 5) {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 5) {
                 assertEquals("Самокат приезжает к вам с полной зарядкой. " +
                                 "Этого хватает на восемь суток — даже если будете кататься без передышек и во сне. " +
                                 "Зарядка не понадобится.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else if (i == 6) {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 6) {
                 assertEquals("Да, пока самокат не привезли. " +
                                 "Штрафа не будет, объяснительной записки тоже не попросим. Все же свои.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
-            } else {
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
+            } else if (number == 7) {
                 assertEquals("Да, обязательно. Всем самокатов! И Москве, и Московской области.",
-                        driver.findElement(By.xpath(modText + i + "']" )).getText());
+                        driver.findElement(By.xpath(modText + number + "']" )).getText());
             }
-
-
-        }
-
     }
 
     public By getTopOrderButton() {

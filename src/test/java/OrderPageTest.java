@@ -5,11 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-
-import ru.yandex.praktikum.objects.MainPage;
 import ru.yandex.praktikum.objects.OrderPage;
 
 import static org.junit.Assert.assertEquals;
@@ -17,8 +13,9 @@ import static org.junit.Assert.assertTrue;
 
 
 @RunWith(Parameterized.class)
-public class ScooterTest {
+public class OrderPageTest {
 
+    private WebDriver driver;
     private final String name;
     private final String surname;
     private final String address;
@@ -29,8 +26,8 @@ public class ScooterTest {
     private final String lease;
     private final String[] colors;
 
-    public ScooterTest(String name, String surname, String address, String station, String number, String date,
-                       String lease, String[] colors) {
+    public OrderPageTest(String name, String surname, String address, String station, String number, String date,
+                        String lease, String[] colors) {
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -41,8 +38,6 @@ public class ScooterTest {
         this.colors = colors;
     }
 
-    private WebDriver driver;
-
 
     @Before
     public void startUp() {
@@ -52,7 +47,6 @@ public class ScooterTest {
 
     }
 
-
     @Parameterized.Parameters
     public static Object[][] getCreds() {
         return new Object[][] {
@@ -61,27 +55,6 @@ public class ScooterTest {
                 {"Наруто", "Узумаки", "11-1 Камитоба-Хокотатэ-чо Минами-Кю Киото", "Ломоносова", "89003001000"
                         , "04,12,20", "двое суток", new String[] {"black", "grey"}},
         };
-    }
-
-
-    @Test
-    public void testMainPage() {
-
-        driver = new EdgeDriver();
-
-        //открываем страницу
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-
-        //создаем экземпляр главной страницы
-        MainPage mainPageObj = new MainPage(driver);
-
-        //проверяем наличие двух кнопок заказа
-        assertTrue(driver.findElement(mainPageObj.getTopOrderButton()).isDisplayed()
-                && driver.findElement(mainPageObj.getBottomOrderButton()).isDisplayed());
-
-        //проверяем что текст в стрелочках соответствует верному
-        mainPageObj.checkArrowsText();
-
     }
 
 
@@ -137,5 +110,4 @@ public class ScooterTest {
     public void tearDown() {
         driver.quit();
     }
-
 }

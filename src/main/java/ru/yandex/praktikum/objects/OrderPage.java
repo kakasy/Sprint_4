@@ -207,9 +207,9 @@ public class OrderPage {
             }
         }
         //Wait for the new tab to finish loading content
-        new WebDriverWait(driver, Duration.ofSeconds(2)).until(titleIs("Дзен"));
+        new WebDriverWait(driver, Duration.ofSeconds(3)).until(titleIs("Дзен"));
 
-        new WebDriverWait(driver, Duration.ofSeconds(2));
+        new WebDriverWait(driver, Duration.ofSeconds(3));
         return driver.getCurrentUrl();
 
     }
