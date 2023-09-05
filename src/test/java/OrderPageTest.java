@@ -25,9 +25,10 @@ public class OrderPageTest {
     private final String date;
     private final String lease;
     private final String[] colors;
+    private final boolean topButton;
 
     public OrderPageTest(String name, String surname, String address, String station, String number, String date,
-                        String lease, String[] colors) {
+                        String lease, String[] colors, boolean topButton) {
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -36,6 +37,7 @@ public class OrderPageTest {
         this.date = date;
         this.lease = lease;
         this.colors = colors;
+        this.topButton = topButton;
     }
 
 
@@ -51,9 +53,9 @@ public class OrderPageTest {
     public static Object[][] getCreds() {
         return new Object[][] {
                 {"Билли", "Херрингтон", "Подвал кожевенного ремесла", "Черниговская", "88005553535", "05.11.2023"
-                        , "сутки", new String[] {"black"}},
+                        , "сутки", new String[] {"black"}, true},
                 {"Наруто", "Узумаки", "11-1 Камитоба-Хокотатэ-чо Минами-Кю Киото", "Ломоносова", "89003001000"
-                        , "04,12,20", "двое суток", new String[] {"black", "grey"}},
+                        , "04,12,20", "двое суток", new String[] {"black", "grey"}, false},
         };
     }
 
@@ -71,11 +73,10 @@ public class OrderPageTest {
         OrderPage orderPageObj = new OrderPage(driver);
 
         //проверяем наличие двух кнопок заказа
-        assertTrue(driver.findElement(orderPageObj.getTopOrderButton()).isDisplayed()
-                && driver.findElement(orderPageObj.getBottomOrderButton()).isDisplayed());
+        orderPageObj.checkOrderButtonsExists();
 
         //нажимаем случайную кнопку заказа
-        orderPageObj.clickRandomButton();
+        orderPageObj.clickOrderButtonMain(topButton);
 
         //заполняем поля заказа
         orderPageObj.fillOrderFields(name, surname, address, station, number);
@@ -93,17 +94,16 @@ public class OrderPageTest {
         orderPageObj.clickYesOrderButton();
 
         //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
-        assertTrue(driver.findElement(orderPageObj.getConfirmWindow()).isDisplayed());
+        orderPageObj.checkInfoWindow();
 
         //смотрим статус заказа
         orderPageObj.clickSeeStatusButton();
 
         //проверяем что после нажатия на лого самоката нас перекинет на главную страницу проката самокатов
-        assertEquals("https://qa-scooter.praktikum-services.ru/", orderPageObj.checkUrlScooterLogoClick());
+        orderPageObj.scooterLogoCheck();
 
         //проверяем что при нажатии на лого Яндекс нас перекинет на новую страницу с нужным адресом
-        assertEquals("https://dzen.ru/?yredirect=true", orderPageObj.checkUrlYandexLogoClick());
-
+        orderPageObj.yandexLogoCheck();
     }
 
     @After

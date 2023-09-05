@@ -6,6 +6,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
@@ -78,27 +79,16 @@ public class OrderPage {
         driver.findElement(nextButton).click();
     }
 
-    //нажатие верхней кнопки "Заказать"
-    public void clickTopButton() {
-        driver.findElement(topOrderButton).click();
-    }
-
-    //скролл и нажатие нижней кнопки "Заказать"
-    public void clickBottomButton() {
-        WebElement element = driver.findElement(bottomOrderButton);
-        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
-        element.click();
-    }
-
-    //случайный выбор кнопки для заказа
-    public void clickRandomButton() {
-        int rand = (int) (Math.random() * 2);
-        if (rand == 1) {
-            clickTopButton();
-            System.out.println("Нажали верхнюю кнопку");
+    //Нажимаем кнопку "Заказать"
+    public void clickOrderButtonMain(boolean topButton) {
+        if (topButton) {
+            driver.findElement(topOrderButton).click();
         } else {
-            clickBottomButton();
-            System.out.println("Нажали нижнюю кнопку");
+            WebElement element = driver.findElement(bottomOrderButton);
+            ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
+            new WebDriverWait(driver, Duration.ofSeconds(3))
+                    .until(ExpectedConditions.visibilityOfElementLocated(bottomOrderButton));
+            element.click();
         }
     }
 
@@ -181,13 +171,13 @@ public class OrderPage {
 
 
     //метод для проверки урла при нажатии на лого Самокат
-    public String checkUrlScooterLogoClick() {
+    private String checkUrlScooterLogoClick() {
         driver.findElement(scooterLogo).click();
         return driver.getCurrentUrl();
     }
 
     //метод проверки урла при нажатии на лого Яндекс
-    public String checkUrlYandexLogoClick() {
+    private String checkUrlYandexLogoClick() {
 
         String originalWindow = driver.getWindowHandle();
         //Check we don't have other windows open already
@@ -214,15 +204,24 @@ public class OrderPage {
 
     }
 
-    public By getTopOrderButton() {
-        return topOrderButton;
+    //проверка наличия кнопок Заказать
+    public void checkOrderButtonsExists() {
+        assertTrue(driver.findElement(topOrderButton).isDisplayed()
+                && driver.findElement(bottomOrderButton).isDisplayed());
     }
 
-    public By getBottomOrderButton() {
-        return bottomOrderButton;
+    public void checkInfoWindow() {
+        //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
+        assertTrue(driver.findElement(confirmWindow).isDisplayed());
     }
 
-    public By getConfirmWindow() {
-        return confirmWindow;
+    //проверяем что после нажатия на лого самоката нас перекинет на главную страницу проката самокатов
+    public void scooterLogoCheck() {
+        assertEquals("https://qa-scooter.praktikum-services.ru/", checkUrlScooterLogoClick());
+    }
+
+    public void yandexLogoCheck() {
+        //проверяем что при нажатии на лого Яндекс нас перекинет на новую страницу с нужным адресом
+        assertEquals("https://dzen.ru/?yredirect=true", checkUrlYandexLogoClick());
     }
 }
