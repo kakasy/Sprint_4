@@ -69,6 +69,9 @@ public class OrderPage {
     //локатор для лого Самокат
     private  final By scooterLogo = By.xpath("//*[@class='Header_LogoScooter__3lsAR']");
 
+    //локатор для текста в окне подтвержденного заказа
+    private final By orderText = By.xpath("//div[contains(@class, 'Order_Text')]");
+
     public OrderPage(WebDriver driver) {
         this.driver = driver;
     }
@@ -213,6 +216,16 @@ public class OrderPage {
     public void checkInfoWindow() {
         //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
         assertTrue(driver.findElement(confirmWindow).isDisplayed());
+    }
+
+    public void checkOrderNumber() {
+        //проверяем что появился текст с инфой о заказе
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(orderText));
+
+        String orderMessage = driver.findElement(orderText).getText();
+        System.out.println(orderMessage);
+        assertTrue(orderMessage.contains("Номер заказа: "));
     }
 
     //проверяем что после нажатия на лого самоката нас перекинет на главную страницу проката самокатов

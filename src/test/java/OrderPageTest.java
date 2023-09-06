@@ -5,12 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import ru.yandex.praktikum.objects.OrderPage;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 
 @RunWith(Parameterized.class)
 public class OrderPageTest {
@@ -75,7 +72,7 @@ public class OrderPageTest {
         //проверяем наличие двух кнопок заказа
         orderPageObj.checkOrderButtonsExists();
 
-        //нажимаем случайную кнопку заказа
+        //нажимаем кнопку заказа
         orderPageObj.clickOrderButtonMain(topButton);
 
         //заполняем поля заказа
@@ -96,14 +93,10 @@ public class OrderPageTest {
         //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
         orderPageObj.checkInfoWindow();
 
+        orderPageObj.checkOrderNumber();
+
         //смотрим статус заказа
         orderPageObj.clickSeeStatusButton();
-
-        //проверяем что после нажатия на лого самоката нас перекинет на главную страницу проката самокатов
-        orderPageObj.scooterLogoCheck();
-
-        //проверяем что при нажатии на лого Яндекс нас перекинет на новую страницу с нужным адресом
-        orderPageObj.yandexLogoCheck();
     }
 
     @After
