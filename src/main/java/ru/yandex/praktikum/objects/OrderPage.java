@@ -1,8 +1,15 @@
 package ru.yandex.praktikum.objects;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.numberOfWindowsToBe;
+import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
 
 //страница заказа самоката
 public class OrderPage {
@@ -47,9 +54,23 @@ public class OrderPage {
     //локатор кнопки "Заказать"
     private final By orderButton = By.xpath("//*[@id='root']/div/div[2]/div[3]/button[2]");
 
-    //Локатор кнопки "Да" для окна оформления заказа
+    //локатор кнопки "Да" для окна оформления заказа
     private final By orderYesButton = By.xpath("//*[@id='root']/div/div[2]/div[5]/div[2]/button[2]");
 
+    //локатор окна с подтвержденным заказом
+    private final By confirmWindow = By.xpath("//*[@class='Order_Modal__YZ-d3']");
+
+    //локатор кнопки "Посмотреть статус"
+    private final By seeStatus = By.xpath("//*[@id='root']/div/div[2]/div[5]/div[2]/button");
+
+    //локатор для лого Яндекс
+    private final By yandexLogo = By.xpath("//*[@class='Header_LogoYandex__3TSOI']");
+
+    //локатор для лого Самокат
+    private  final By scooterLogo = By.xpath("//*[@class='Header_LogoScooter__3lsAR']");
+
+    //локатор для текста в окне подтвержденного заказа
+    private final By orderText = By.xpath("//div[contains(@class, 'Order_Text')]");
 
     public OrderPage(WebDriver driver) {
         this.driver = driver;
@@ -61,27 +82,16 @@ public class OrderPage {
         driver.findElement(nextButton).click();
     }
 
-    //нажатие верхней кнопки "Заказать"
-    public void clickTopButton() {
-        driver.findElement(topOrderButton).click();
-    }
-
-    //скролл и нажатие нижней кнопки "Заказать"
-    public void clickBottomButton() {
-        WebElement element = driver.findElement(bottomOrderButton);
-        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
-        element.click();
-    }
-
-    //случайный выбор кнопки для заказа
-    public void clickRandomButton() {
-        int rand = (int) (Math.random() * 2);
-        if (rand == 1) {
-            clickTopButton();
-            System.out.println("Нажали верхнюю кнопку");
+    //Нажимаем кнопку "Заказать"
+    public void clickOrderButtonMain(boolean topButton) {
+        if (topButton) {
+            driver.findElement(topOrderButton).click();
         } else {
-            clickBottomButton();
-            System.out.println("Нажали нижнюю кнопку");
+            WebElement element = driver.findElement(bottomOrderButton);
+            ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
+            new WebDriverWait(driver, Duration.ofSeconds(3))
+                    .until(ExpectedConditions.visibilityOfElementLocated(bottomOrderButton));
+            element.click();
         }
     }
 
@@ -149,11 +159,82 @@ public class OrderPage {
         driver.findElement(orderYesButton).click();
     }
 
-    public By getTopOrderButton() {
-        return topOrderButton;
+    public void clickSeeStatusButton() {
+        WebElement element = driver.findElement(confirmWindow);
+        //скроллим до нужного элемента
+        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
+        element.click();
+        //ждем пока появится текст
+        new WebDriverWait(driver, Duration.ofSeconds(2))
+                .until(ExpectedConditions
+                        .visibilityOf(driver.findElement(confirmWindow)));
+        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
+        driver.findElement(seeStatus).click();
     }
 
-    public By getBottomOrderButton() {
-        return bottomOrderButton;
+
+    //метод для проверки урла при нажатии на лого Самокат
+    private String checkUrlScooterLogoClick() {
+        driver.findElement(scooterLogo).click();
+        return driver.getCurrentUrl();
+    }
+
+    //метод проверки урла при нажатии на лого Яндекс
+    private String checkUrlYandexLogoClick() {
+
+        String originalWindow = driver.getWindowHandle();
+        //Check we don't have other windows open already
+        assert driver.getWindowHandles().size() == 1;
+
+        //Click the link which opens in a new window
+        driver.findElement(yandexLogo).click();
+
+        //Wait for the new window or tab
+        new WebDriverWait(driver, Duration.ofSeconds(2)).until(numberOfWindowsToBe(2));
+
+        //Loop through until we find a new window handle
+        for (String windowHandle : driver.getWindowHandles()) {
+            if(!originalWindow.contentEquals(windowHandle)) {
+                driver.switchTo().window(windowHandle);
+                break;
+            }
+        }
+        //Wait for the new tab to finish loading content
+        new WebDriverWait(driver, Duration.ofSeconds(3)).until(titleIs("Дзен"));
+
+        new WebDriverWait(driver, Duration.ofSeconds(3));
+        return driver.getCurrentUrl();
+
+    }
+
+    //проверка наличия кнопок Заказать
+    public void checkOrderButtonsExists() {
+        assertTrue(driver.findElement(topOrderButton).isDisplayed()
+                && driver.findElement(bottomOrderButton).isDisplayed());
+    }
+
+    public void checkInfoWindow() {
+        //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
+        assertTrue(driver.findElement(confirmWindow).isDisplayed());
+    }
+
+    public void checkOrderNumber() {
+        //проверяем что появился текст с инфой о заказе
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(orderText));
+
+        String orderMessage = driver.findElement(orderText).getText();
+        System.out.println(orderMessage);
+        assertTrue(orderMessage.contains("Номер заказа: "));
+    }
+
+    //проверяем что после нажатия на лого самоката нас перекинет на главную страницу проката самокатов
+    public void scooterLogoCheck() {
+        assertEquals("https://qa-scooter.praktikum-services.ru/", checkUrlScooterLogoClick());
+    }
+
+    public void yandexLogoCheck() {
+        //проверяем что при нажатии на лого Яндекс нас перекинет на новую страницу с нужным адресом
+        assertEquals("https://dzen.ru/?yredirect=true", checkUrlYandexLogoClick());
     }
 }

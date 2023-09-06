@@ -6,17 +6,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.GeckoDriverInfo;
-import ru.yandex.praktikum.objects.MainPage;
+import org.openqa.selenium.edge.EdgeDriver;
 import ru.yandex.praktikum.objects.OrderPage;
 
-import static org.junit.Assert.assertTrue;
-
-
 @RunWith(Parameterized.class)
-public class ScooterTest {
+public class OrderPageTest {
 
+    private WebDriver driver;
     private final String name;
     private final String surname;
     private final String address;
@@ -26,9 +22,10 @@ public class ScooterTest {
     private final String date;
     private final String lease;
     private final String[] colors;
+    private final boolean topButton;
 
-    public ScooterTest(String name, String surname, String address, String station, String number, String date,
-                       String lease, String[] colors) {
+    public OrderPageTest(String name, String surname, String address, String station, String number, String date,
+                        String lease, String[] colors, boolean topButton) {
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -37,48 +34,26 @@ public class ScooterTest {
         this.date = date;
         this.lease = lease;
         this.colors = colors;
+        this.topButton = topButton;
     }
-
-    private WebDriver driver;
 
 
     @Before
     public void startUp() {
         //WebDriverManager.chromedriver().setup();
-        driver = WebDriverManager.firefoxdriver().create();
+        //WebDriverManager.firefoxdriver().setup();
+        WebDriverManager.edgedriver().setup();
 
     }
-
 
     @Parameterized.Parameters
     public static Object[][] getCreds() {
         return new Object[][] {
                 {"Билли", "Херрингтон", "Подвал кожевенного ремесла", "Черниговская", "88005553535", "05.11.2023"
-                        , "сутки", new String[] {"black"}},
+                        , "сутки", new String[] {"black"}, true},
                 {"Наруто", "Узумаки", "11-1 Камитоба-Хокотатэ-чо Минами-Кю Киото", "Ломоносова", "89003001000"
-                        , "04,12,20", "двое суток", new String[] {"black", "grey"}},
+                        , "04,12,20", "двое суток", new String[] {"black", "grey"}, false},
         };
-    }
-
-
-    @Test
-    public void testMainPage() {
-        //driver = new ChromeDriver();
-        //driver = new FirefoxDriver();
-
-        //открываем страницу
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-
-        //создаем экземпляр главной страницы
-        MainPage mainPageObj = new MainPage(driver);
-
-        //проверяем наличие двух кнопок заказа
-        assertTrue(driver.findElement(mainPageObj.getTopOrderButton()).isDisplayed()
-                && driver.findElement(mainPageObj.getBottomOrderButton()).isDisplayed());
-
-        //проверяем что текст в стрелочках соответствует верному
-        mainPageObj.checkArrowsText();
-
     }
 
 
@@ -86,7 +61,7 @@ public class ScooterTest {
     public void testOrderPage() {
         //driver = new ChromeDriver();
         //driver = new FirefoxDriver();
-
+        driver = new EdgeDriver();
 
         //открываем страницу
         driver.get("https://qa-scooter.praktikum-services.ru/");
@@ -95,11 +70,10 @@ public class ScooterTest {
         OrderPage orderPageObj = new OrderPage(driver);
 
         //проверяем наличие двух кнопок заказа
-        assertTrue(driver.findElement(orderPageObj.getTopOrderButton()).isDisplayed()
-                && driver.findElement(orderPageObj.getBottomOrderButton()).isDisplayed());
+        orderPageObj.checkOrderButtonsExists();
 
-        //нажимаем случайную кнопку заказа
-        orderPageObj.clickRandomButton();
+        //нажимаем кнопку заказа
+        orderPageObj.clickOrderButtonMain(topButton);
 
         //заполняем поля заказа
         orderPageObj.fillOrderFields(name, surname, address, station, number);
@@ -116,12 +90,17 @@ public class ScooterTest {
         //подтверждаем заказ, нажав на кнопку "Да"
         orderPageObj.clickYesOrderButton();
 
+        //проверяем что после нажатия на кнопку появилось окно с информацией о заказе
+        orderPageObj.checkInfoWindow();
+
+        orderPageObj.checkOrderNumber();
+
+        //смотрим статус заказа
+        orderPageObj.clickSeeStatusButton();
     }
 
-
-//    @After
-//    public void tearDown() {
-//        driver.quit();
-//    }
-
+    @After
+    public void tearDown() {
+        driver.quit();
+    }
 }
